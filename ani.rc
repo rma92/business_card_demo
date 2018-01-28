@@ -15,7 +15,7 @@ END
 STRINGTABLE
 BEGIN
   IDS_NAME "Rich A. Marino"
-  IDS_SUBTITLE "Measuring Up Success"
+  IDS_SUBTITLE "Technologist, Software Engineer"
   IDS_TEL "+1-857-288-8884"
   IDS_URL "https://rm.vg/"
   IDS_EMAIL "q rm.vg"
@@ -25,16 +25,3 @@ END
 
 IDI_1 ICON "us1.ico"
 
-V VERSIONINFO
-FILEVERSION 1,0,0,0
-BEGIN
- BLOCK "StringFileInfo"
- BEGIN
-  BLOCK "040904b0"
-  BEGIN
-    VALUE "CompanyName", "Rich A. Marino"
-    VALUE "FileDescription", "Business Card"
-    VALUE "LegalCopyright", "(C)2017 Rich A. Marino"
-  END
- END
-END
