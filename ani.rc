@@ -2,7 +2,7 @@
 
 IMG001 ENHANCEDMETAFILE "logo.emf"
 
-MAINMENU MENU
+MN MENU
 BEGIN
   POPUP "&File"
   BEGIN
@@ -18,5 +18,7 @@ BEGIN
   IDS_SUBTITLE "Measuring Up Success"
   IDS_TEL "+1-857-288-8884"
   IDS_URL "https://rm.vg/"
-  IDS_EMAIL "q/rm.vg"
+  IDS_EMAIL "q rm.vg"
+  IDS_CMDURL "cmd /c start https://rm.vg/"
+  IDS_CMDEMAIL "cmd /c start mailto:q rm.vg"
 END
