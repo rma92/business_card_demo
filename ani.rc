@@ -22,3 +22,19 @@ BEGIN
   IDS_CMDURL "cmd /c start https://rm.vg/"
   IDS_CMDEMAIL "cmd /c start mailto:q rm.vg"
 END
+
+IDI_1 ICON "us1.ico"
+
+V VERSIONINFO
+FILEVERSION 1,0,0,0
+BEGIN
+ BLOCK "StringFileInfo"
+ BEGIN
+  BLOCK "040904b0"
+  BEGIN
+    VALUE "CompanyName", "Rich A. Marino"
+    VALUE "FileDescription", "Business Card"
+    VALUE "LegalCopyright", "(C)2017 Rich A. Marino"
+  END
+ END
+END

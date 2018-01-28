@@ -16,3 +16,5 @@ LPCSTR AppName = "d";
 
 #define MIN_IMG 10001
 #define MAX_IMG 10001
+
+#define IDI_1 4001

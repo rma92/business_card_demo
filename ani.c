@@ -7,7 +7,9 @@ HENHMETAFILE hemf;
 HWND hWnd1;
 
 HDC images[1024];
-HFONT font1;
+HFONT font1; //title font
+HFONT font2; //other text font
+HFONT font3; //url font
 HBITMAP images_bmp[1024];
 RECT image_size;
 HBRUSH transparent_color;
@@ -146,6 +148,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
       PAINTSTRUCT ps;
       RECT cr;
       HFONT hMemdcFontOld;
+      COLORREF hMemdcColorOld;
       GetClientRect( hWnd, &cr );
       hdc = BeginPaint( hWnd, &ps );
       if( hmemdc == 0 )
@@ -153,7 +156,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         hmemdc = CreateCompatibleDC( hdc );
         orig_buffer_size = cr;
         hmembmp = CreateCompatibleBitmap( GetDC( hWnd1 ), orig_buffer_size.right, orig_buffer_size.bottom );
-        font1 = CreateFont(rm_height* 0.20, 0, 0, 0, 300, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, "Segoe UI");      
+        font1 = CreateFont(rm_height* 0.22, 0, 0, 0, 700, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, "Segoe UI");
+        font2 = CreateFont(rm_height* 0.20, 0, 0, 0, 300, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, "Segoe UI");
+        font3 = CreateFont(rm_height* 0.20, 0, 0, 0, 300, FALSE, TRUE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, "Segoe UI");
         SelectObject( hmemdc, hmembmp );
         FillRect( hmemdc, &cr, RGB(255,255,255) );
       }
@@ -166,15 +171,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
       hMemdcFontOld = (HFONT)SelectObject( hmemdc, font1 );
       DrawText( hmemdc, szName, -1, &textTempRect, DT_LEFT );
       textTempRect.top += rm_height * 0.20;
+      
+      SelectObject( hmemdc, font2 );
       DrawText( hmemdc, szSubname, -1, &textTempRect, DT_LEFT );
       textTempRect.top += rm_height * 0.20;
       DrawText( hmemdc, szTel, -1, &textTempRect, DT_LEFT );
       textTempRect.top += rm_height * 0.20;
+      
+      SelectObject( hmemdc, font3 );
+      hMemdcColorOld = SetTextColor( hmemdc, RGB( 0, 0, 255 ) );
       DrawText( hmemdc, szURL, -1, &textTempRect, DT_LEFT );
       textTempRect.top += rm_height * 0.20;
       DrawText( hmemdc, szEmail, -1, &textTempRect, DT_LEFT );
       textTempRect.top += rm_height * 0.20;
       SelectObject( hmemdc, hMemdcFontOld );
+      SetTextColor( hmemdc, hMemdcColorOld );
 
 
       //double buffer
@@ -207,7 +218,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     break;
     case WM_LBUTTONDOWN:
     {
-      printf( "%d", (signed int)LOWORD( lParam ));
       if( (signed int)LOWORD( lParam ) > textTempRect.left * curscale_x
         &&(signed int)LOWORD( lParam ) < textTempRect.right * curscale_x )
         {
@@ -249,7 +259,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nC
   wc1.lpfnWndProc = (WNDPROC)WndProc;
   wc1.style = CS_DBLCLKS | CS_VREDRAW | CS_HREDRAW;
   wc1.hbrBackground = GetSysColorBrush(COLOR_WINDOW);
-  wc1.hIcon = LoadIcon(NULL, IDI_INFORMATION);
+  wc1.hIcon = LoadIcon( hInst, MAKEINTRESOURCE( IDI_1 ) );//LoadIcon(NULL, IDI_INFORMATION);
   wc1.hCursor = LoadCursor(NULL, IDC_ARROW);
   wc1.lpszMenuName = "MN";
   if(RegisterClass(&wc1) == FALSE) return 0;
