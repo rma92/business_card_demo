@@ -7,6 +7,7 @@ HENHMETAFILE hemf;
 HWND hWnd1;
 
 HDC images[1024];
+HFONT font1;
 HBITMAP images_bmp[1024];
 RECT image_size;
 HBRUSH transparent_color;
@@ -118,6 +119,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
       HDC hdc;
       PAINTSTRUCT ps;
       RECT cr;
+      HFONT hMemdcFontOld;
       GetClientRect( hWnd, &cr );
       hdc = BeginPaint( hWnd, &ps );
       if( hmemdc == 0 )
@@ -125,6 +127,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         hmemdc = CreateCompatibleDC( hdc );
         orig_buffer_size = cr;
         hmembmp = CreateCompatibleBitmap( GetDC( hWnd1 ), orig_buffer_size.right, orig_buffer_size.bottom );
+        font1 = CreateFont(rm_height* 0.20, 0, 0, 0, 300, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, "Segoe UI");      
         SelectObject( hmemdc, hmembmp );
         FillRect( hmemdc, &cr, RGB(255,255,255) );
       }
@@ -133,8 +136,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
       TransparentBlt( hmemdc, (rm_max_width - rm_width) * 0.5, 0, rm_width, rm_height, images[0], 0, 0, image_size.right, image_size.bottom, RGB( 0, 255, 0) );
       textTempRect = orig_buffer_size;
       textTempRect.left = rm_max_width;
-      DrawText( hmemdc, szName, -1, &textTempRect, DT_LEFT );
       
+      hMemdcFontOld = (HFONT)SelectObject( hmemdc, font1 );
+      DrawText( hmemdc, szName, -1, &textTempRect, DT_LEFT );
+      textTempRect.top += rm_height * 0.20;
+      DrawText( hmemdc, szSubname, -1, &textTempRect, DT_LEFT );
+      textTempRect.top += rm_height * 0.20;
+      DrawText( hmemdc, szTel, -1, &textTempRect, DT_LEFT );
+      textTempRect.top += rm_height * 0.20;
+      DrawText( hmemdc, szURL, -1, &textTempRect, DT_LEFT );
+      textTempRect.top += rm_height * 0.20;
+      DrawText( hmemdc, szEmail, -1, &textTempRect, DT_LEFT );
+      textTempRect.top += rm_height * 0.20;
+      SelectObject( hmemdc, hMemdcFontOld );
+
       //double buffer
       StretchBlt ( hdc, 0, 0, cr.right, cr.bottom, hmemdc, 0, 0, orig_buffer_size.right, orig_buffer_size.bottom, SRCCOPY );
       EndPaint( hWnd, &ps );
