@@ -1,5 +1,9 @@
-LPCSTR AppName = "Te st";
-//#define IDS_APPNAME 3001
+LPCSTR AppName = "Rich A. Marino";
+#define IDS_NAME 3001
+#define IDS_SUBTITLE 3002
+#define IDS_TEL 3003
+#define IDS_URL 3004
+#define IDS_EMAIL 3005
 
 #define IDM_FILE_DISPLAYINFO 40001
 #define IDM_FILE_EXIT 40005

@@ -14,4 +14,9 @@ END
 
 STRINGTABLE
 BEGIN
+  IDS_NAME "Rich A. Marino"
+  IDS_SUBTITLE "Measuring Up Success"
+  IDS_TEL "+1-857-288-8884"
+  IDS_URL "https://rm.vg/"
+  IDS_EMAIL "q/rm.vg"
 END

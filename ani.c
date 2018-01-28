@@ -11,13 +11,25 @@ HBITMAP images_bmp[1024];
 RECT image_size;
 HBRUSH transparent_color;
 
+RECT textTempRect;
+LPCTSTR szName[128];
+LPCTSTR szSubname[128];
+LPCTSTR szTel[128];
+LPCTSTR szURL[128];
+LPCTSTR szEmail[128];
+
+//Holds the original size of the bitmap for double buffering,
+//in case the window size is changed.
+RECT orig_buffer_size;
 HDC hmemdc;
 HBITMAP hmembmp;
-int timer = 1000/60; //frame in ms
+int timer_time = 1000/60; //frame in ms
 int rm_width_dx = -5;
 int rm_width = 300;
-int rm_max_width = 600;
+int rm_height = 600; //updated in wm_create
+int rm_max_width = 600; //updated in wm_create
 
+int render_scale = 0.5; //multiply everything drawn by this;
 void CALLBACK MonitorEnum( HMONITOR hMon, HDC hdc, LPRECT lprcMonitor, LPARAM pData )
 {
   UnionRect( &union_displays_rect, &union_displays_rect, lprcMonitor );
@@ -76,7 +88,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
       update_display_info();
       SetWindowPos( hWnd, 0, union_displays_rect.left, union_displays_rect.top, union_displays_rect.right, union_displays_rect.bottom, 0);
       load_pictures();
-      SetTimer( hWnd, IDT_TIMER1, 1000/60, NULL );
+      rm_height = ( union_displays_rect.bottom - union_displays_rect.top ) * 0.4;
+      rm_max_width = rm_height * 1.6;
+      rm_width = rm_max_width * 0.5;
+      rm_width_dx = rm_max_width * .02;
+      SetTimer( hWnd, IDT_TIMER1, timer_time, NULL );
+      
+      //Load Strings
+      LoadString( GetModuleHandle( NULL ) , IDS_NAME, (char*) szName, sizeof( szName ) );
+      LoadString( GetModuleHandle( NULL ) , IDS_SUBTITLE, (char*) szSubname, sizeof( szSubname ) );
+      LoadString( GetModuleHandle( NULL ) , IDS_TEL, (char*) szTel, sizeof( szTel ) );
+      LoadString( GetModuleHandle( NULL ) , IDS_URL, (char*) szURL, sizeof( szURL ) );
+      LoadString( GetModuleHandle( NULL ) , IDS_EMAIL, (char*) szEmail, sizeof( szEmail ) );
+      
       break;
     case WM_COMMAND:
       switch(LOWORD(wParam))
@@ -99,15 +123,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
       if( hmemdc == 0 )
       {
         hmemdc = CreateCompatibleDC( hdc );
-        hmembmp = CreateCompatibleBitmap( GetDC( hWnd1 ), cr.right, cr.bottom );
+        orig_buffer_size = cr;
+        hmembmp = CreateCompatibleBitmap( GetDC( hWnd1 ), orig_buffer_size.right, orig_buffer_size.bottom );
         SelectObject( hmemdc, hmembmp );
         FillRect( hmemdc, &cr, RGB(255,255,255) );
       }
-      FillRect( hmemdc, &cr, RGB(255,255,255));
-      TransparentBlt( hmemdc, 0, 0, rm_width, 200, images[0], 0, 0, image_size.right, image_size.bottom, RGB( 0, 255, 0) );
-      //FillRect( hdc, &cr, RGB( 255,255,255 ) );
-      BitBlt( hdc, 0, 0, cr.right, cr.bottom, hmemdc, 0, 0, SRCCOPY );
-      //TransparentBlt( hdc, 0, 0, rm_width, 200, images[0], 0, 0, image_size.right, image_size.bottom, RGB( 0, 255, 0) );
+
+      FillRect( hmemdc, &orig_buffer_size, RGB(255,255,255));
+      TransparentBlt( hmemdc, (rm_max_width - rm_width) * 0.5, 0, rm_width, rm_height, images[0], 0, 0, image_size.right, image_size.bottom, RGB( 0, 255, 0) );
+      textTempRect = orig_buffer_size;
+      textTempRect.left = rm_max_width;
+      DrawText( hmemdc, szName, -1, &textTempRect, DT_LEFT );
+      
+      //double buffer
+      StretchBlt ( hdc, 0, 0, cr.right, cr.bottom, hmemdc, 0, 0, orig_buffer_size.right, orig_buffer_size.bottom, SRCCOPY );
       EndPaint( hWnd, &ps );
     }
     break;
@@ -129,6 +158,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
       }
     }
     break;
+    case WM_SIZE:
+      return DefWindowProc( hWnd, message, wParam, lParam );
+      break;
     case WM_DESTROY:
       PostQuitMessage(0);
       break;
