@@ -35,8 +35,8 @@ int rm_width = 300;
 int rm_height = 600; //updated in wm_create
 int rm_max_width = 600; //updated in wm_create
 
-float curscale_x = 1; //used for dealing with clickable things
-float curscale_y = 1;
+//float curscale_x = 1; //used for dealing with clickable things
+//float curscale_y = 1;
 
 //float render_scale = 0.5; //multiply everything drawn by this;
 void CALLBACK MonitorEnum( HMONITOR hMon, HDC hdc, LPRECT lprcMonitor, LPARAM pData )
@@ -114,10 +114,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
       update_display_info();
       SetWindowPos( hWnd, 0, union_displays_rect.left, union_displays_rect.top, union_displays_rect.right, union_displays_rect.bottom, 0);
       load_pictures();
-      rm_height = ( union_displays_rect.bottom - union_displays_rect.top ) * 0.4;
-      rm_max_width = rm_height * 1.6;
-      rm_width = rm_max_width * 0.5;
-      rm_width_dx = rm_max_width * .02;
+      rm_height = ( union_displays_rect.bottom - union_displays_rect.top ) / 10 * 4;
+      rm_max_width = rm_height / 10 * 16;
+      rm_width = rm_max_width / 2;
+      rm_width_dx = rm_max_width / 50;
       SetTimer( hWnd, IDT_TIMER1, timer_time, NULL );
       
       //Load Strings
@@ -156,41 +156,41 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         hmemdc = CreateCompatibleDC( hdc );
         orig_buffer_size = cr;
         hmembmp = CreateCompatibleBitmap( GetDC( hWnd1 ), orig_buffer_size.right, orig_buffer_size.bottom );
-        font1 = CreateFont(rm_height* 0.22, 0, 0, 0, 700, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, "Segoe UI");
-        font2 = CreateFont(rm_height* 0.20, 0, 0, 0, 300, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, "Segoe UI");
-        font3 = CreateFont(rm_height* 0.20, 0, 0, 0, 300, FALSE, TRUE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, "Segoe UI");
+        font1 = CreateFont(rm_height / 5 + rm_height / 50, 0, 0, 0, 700, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, "Segoe UI");
+        font2 = CreateFont(rm_height / 5, 0, 0, 0, 300, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, "Segoe UI");
+        font3 = CreateFont(rm_height / 5, 0, 0, 0, 300, FALSE, TRUE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, "Segoe UI");
         SelectObject( hmemdc, hmembmp );
         FillRect( hmemdc, &cr, RGB(255,255,255) );
       }
 
       FillRect( hmemdc, &orig_buffer_size, RGB(255,255,255));
-      TransparentBlt( hmemdc, (rm_max_width - rm_width) * 0.5, 0, rm_width, rm_height, images[0], 0, 0, image_size.right, image_size.bottom, RGB( 0, 255, 0) );
+      TransparentBlt( hmemdc, (rm_max_width - rm_width) / 2, 0, rm_width, rm_height, images[0], 0, 0, image_size.right, image_size.bottom, RGB( 0, 255, 0) );
       textTempRect = orig_buffer_size;
       textTempRect.left = rm_max_width;
       
       hMemdcFontOld = (HFONT)SelectObject( hmemdc, font1 );
       DrawText( hmemdc, szName, -1, &textTempRect, DT_LEFT );
-      textTempRect.top += rm_height * 0.20;
+      textTempRect.top += rm_height / 5;
       
       SelectObject( hmemdc, font2 );
       DrawText( hmemdc, szSubname, -1, &textTempRect, DT_LEFT );
-      textTempRect.top += rm_height * 0.20;
+      textTempRect.top += rm_height / 5;
       DrawText( hmemdc, szTel, -1, &textTempRect, DT_LEFT );
-      textTempRect.top += rm_height * 0.20;
+      textTempRect.top += rm_height / 5;
       
       SelectObject( hmemdc, font3 );
       hMemdcColorOld = SetTextColor( hmemdc, RGB( 0, 0, 255 ) );
       DrawText( hmemdc, szURL, -1, &textTempRect, DT_LEFT );
-      textTempRect.top += rm_height * 0.20;
+      textTempRect.top += rm_height / 5;
       DrawText( hmemdc, szEmail, -1, &textTempRect, DT_LEFT );
-      textTempRect.top += rm_height * 0.20;
+      textTempRect.top += rm_height / 5;
       SelectObject( hmemdc, hMemdcFontOld );
       SetTextColor( hmemdc, hMemdcColorOld );
 
 
       //double buffer
-      curscale_x = (float)(cr.right) / (orig_buffer_size.right);
-      curscale_y = (float)(cr.bottom) / (orig_buffer_size.bottom);
+      //curscale_x = (float)(cr.right) / (orig_buffer_size.right);
+      //curscale_y = (float)(cr.bottom) / (orig_buffer_size.bottom);
       StretchBlt ( hdc, 0, 0, cr.right, cr.bottom, hmemdc, 0, 0, orig_buffer_size.right, orig_buffer_size.bottom, SRCCOPY );
 
       //Rectangle( hdc, textTempRect.left * curscale_x, rm_height * 0.60 * curscale_y, textTempRect.right * curscale_x, rm_height * 0.80 * curscale_y );
@@ -218,20 +218,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     break;
     case WM_LBUTTONDOWN:
     {
+    /*
       if( (signed int)LOWORD( lParam ) > textTempRect.left * curscale_x
         &&(signed int)LOWORD( lParam ) < textTempRect.right * curscale_x )
         {
           if( (signed int)HIWORD( lParam ) > rm_height * curscale_y * 0.60
         &&(signed int)HIWORD( lParam ) < rm_height * curscale_y * 0.80 )
           {
-            system( szCmdURL );
+            //system( szCmdURL );
           }
           if( (signed int)HIWORD( lParam ) > rm_height * curscale_y * 0.80
         &&(signed int)HIWORD( lParam ) < rm_height * curscale_y )
           {
-            system( szCmdMail );
+            //system( szCmdMail );
           }
         }
+    */
     }
     break;
     case WM_SIZE:
@@ -245,7 +247,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
   }
   return 0;
 }
-int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nCmdShow)
+
+void _start()
+//int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nCmdShow)
 {
   MSG msg1;
   WNDCLASS wc1;
@@ -254,21 +258,22 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nC
   //LoadString( hInst, IDS_APPNAME, (char*) szAppName, sizeof( szAppName ) );
 
   ZeroMemory(&wc1, sizeof wc1);
-  wc1.hInstance = hInst;
+  wc1.hInstance = GetModuleHandle(NULL);
   wc1.lpszClassName = AppName;
   wc1.lpfnWndProc = (WNDPROC)WndProc;
   wc1.style = CS_DBLCLKS | CS_VREDRAW | CS_HREDRAW;
   wc1.hbrBackground = GetSysColorBrush(COLOR_WINDOW);
-  wc1.hIcon = LoadIcon( hInst, MAKEINTRESOURCE( IDI_1 ) );//LoadIcon(NULL, IDI_INFORMATION);
+  wc1.hIcon = LoadIcon( GetModuleHandle(NULL), MAKEINTRESOURCE( IDI_1 ) );//LoadIcon(NULL, IDI_INFORMATION);
   wc1.hCursor = LoadCursor(NULL, IDC_ARROW);
   wc1.lpszMenuName = "MN";
-  if(RegisterClass(&wc1) == FALSE) return 0;
-  hWnd1 = CreateWindow(AppName, AppName, WS_OVERLAPPEDWINDOW | WS_VISIBLE, 10, 10, 360, 240, 0, 0, hInst, 0);
-  if(hWnd1 == NULL) return 0;
+  if(RegisterClass(&wc1) == FALSE) ExitProcess( 1 );
+  hWnd1 = CreateWindow(AppName, AppName, WS_OVERLAPPEDWINDOW | WS_VISIBLE, 10, 10, 360, 240, 0, 0, GetModuleHandle(NULL), 0);
+  if(hWnd1 == NULL) ExitProcess( 1 );
   while(GetMessage(&msg1,NULL,0,0) > 0){
     TranslateMessage(&msg1);
     DispatchMessage(&msg1);
   }
-  return msg1.wParam;
+  //return msg1.wParam;
+  ExitProcess( msg1.wParam );
 }
 

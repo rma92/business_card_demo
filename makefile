@@ -4,6 +4,7 @@ SOURCES = \
           ani.c
 
 LIBS = \
+          kernel32.lib \
           user32.lib \
           gdi32.lib \
           msimg32.lib
@@ -14,4 +15,5 @@ all : app
 
 app : $(SOURCES)
   rc /Fo ani.res $(RC)
-  cl /Fe$(TARGET) $(SOURCES) /link ani.res $(LIBS)
+  cl -nologo /Fe$(TARGET) -Gm- -GR- -EHa- -GS- -Oi -Tc $(SOURCES) /link -nodefaultlib /ENTRY:_start -subsystem:windows ani.res $(LIBS)
+
